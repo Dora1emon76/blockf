@@ -39,7 +39,7 @@ def set_webhook():
     bot_token = request.args.get("token")
     # Use serveo public URL as the webhook URL
     serveo_url = os.environ.get("SERVEO_URL", "https://localhost:88")
-    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url=https://sperno.servo.net/tg_webhook?token={bot_token}")
+    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url=https://sperno.serveo.net/tg_webhook?token={bot_token}")
     return "SUCCESS!"
 
 @app.route("/")
