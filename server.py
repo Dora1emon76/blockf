@@ -4,7 +4,7 @@ from flask import Flask, request
 import pyrogram
 import threading
 import re
-
+import ssl
 # List of patterns to match
 patterns = ['#Ad', '#branԁDiscount', '#paidAD', '#paidad', '#AD', '#Paidad', '#PaidAD', 'bots.business/ads', '#PaidAd','#PromotіonInғ1uencer','#sales','#influеncermarketіпg','#placementAd', 'sponsored','#AdvertisementMarketing']
 
