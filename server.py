@@ -25,10 +25,10 @@ def send_post_request(bot_token, data):
 
 # Start serveo and create a tunnel
 def start_serveo():
-    serveo_process = subprocess.Popen(['ssh', '-R', '80:localhost:88', 'serveo.net'], stdout=subprocess.PIPE)
+    serveo_process = subprocess.Popen(['ssh', '-R', '80:localhost:88', 'serveo.net'])
     atexit.register(lambda: serveo_process.terminate())
     serveo_url = serveo_process.communicate()[0].decode().strip()
-    os.environ["SERVEO_URL"] = serveo_url
+os.environ["SERVEO_URL"] = serveo_url
     print(f'serveo URL: {os.environ["SERVEO_URL"]}')
 # serveo initialization
 serveo_thread = threading.Thread(target=start_serveo)
@@ -39,7 +39,7 @@ def set_webhook():
     bot_token = request.args.get("token")
     # Use serveo public URL as the webhook URL
     serveo_url = os.environ.get("SERVEO_URL", "https://localhost:88")
-    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url=https://{serveo_url}/tg_webhook?token={bot_token}")
+    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url={serveo_url}/tg_webhook?token={bot_token}")
     return "SUCCESS!"
 
 @app.route("/")
