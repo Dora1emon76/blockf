@@ -47,7 +47,16 @@ def start_serveo():
 serveo_thread = threading.Thread(target=start_serveo)
 serveo_thread.start()
 
-
+def get_serveo_url():
+    try:
+        response = requests.get('https://serveo.net/api/serveo-url')
+        if response.status_code == 200:
+            serveo_url = response.json().get('url')
+            return serveo_url
+        else:
+            print(f"Serveo API error: {response.status_code}")
+    except Exception as e:
+        print(f"Error accessing Serveo API: {e}")
 
 
 @app.route("/set")
