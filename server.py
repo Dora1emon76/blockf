@@ -24,10 +24,17 @@ def send_post_request(bot_token, data):
         print(e)
 
 # Start serveo and create a tunnel
+
 def start_serveo():
-    os.environ["SERVEO_URL"] = "https://carpo.serveo.net"
-    print(f'serveo URL: {os.environ["SERVEO_URL"]}')
-    
+    try:
+        subdomain = "abhishek"  # Replace with your desired subdomain
+        serveo_process = subprocess.Popen(['ssh', '-R', f'{subdomain}:80:localhost:88', 'serveo.net'], stdout=subprocess.PIPE)
+        atexit.register(lambda: serveo_process.terminate())
+        os.environ["SERVEO_URL"] = f"https://{subdomain}.serveo.net"
+        print(f'serveo URL: {os.environ["SERVEO_URL"]}')
+    except Exception as e:
+        print(f"Error starting serveo: {e}")
+
 # serveo initialization
 serveo_thread = threading.Thread(target=start_serveo)
 serveo_thread.start()
