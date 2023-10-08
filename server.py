@@ -1,15 +1,14 @@
+ost', port=88)
 import asyncio
 import requests
 from flask import Flask, request
 import pyrogram
 import threading
 import re
-import subprocess
-import atexit
-import os
+from pyngrok import ngrok  # Install pyngrok using pip install pyngrok
 
 # List of patterns to match
-patterns = ['#','#Ad', '#branԁDiscount', '#paidAD', '#paidad', '#AD', '#Paidad', '#PaidAD', 'bots.business/ads', '#PaidAd','#PromotіonInғ1uencer','#sales','#influеncermarketіпg','#placementAd', 'sponsored','#AdvertisementMarketing']
+patterns = ['#', '#Ad', '#branԁDiscount', '#paidAD', '#paidad', '#AD', '#Paidad', '#PaidAD', 'bots.business/ads', '#PaidAd', '#PromotіonInғ1uencer', '#sales', '#influеncermarketіпg', '#placementAd', 'sponsored', '#AdvertisementMarketing']
 
 # Combine the patterns into a single regex pattern
 pattern = '|'.join(re.escape(p) for p in patterns)
@@ -23,48 +22,20 @@ def send_post_request(bot_token, data):
     except Exception as e:
         print(e)
 
-# Start serveo and create a tunnel
+# Start ngrok and create a tunnel
+public_url = ngrok.connect(port=5000)
 
-def start_serveo():
-    try:
-        serveo_process = subprocess.Popen(['ssh', '-R', '80:localhost:88', 'serveo.net'], stdout=subprocess.PIPE)
-        atexit.register(lambda: serveo_process.terminate())
-        
-        # Read both stdout and stderr to capture any potential error messages
-        serveo_url = serveo_process.stdout.readline().decode().strip()
-        serveo_error = serveo_process.stderr.read().decode().strip()
-        
-        if serveo_url:
-            os.environ["SERVEO_URL"] = serveo_url
-            print(f'serveo URL: {os.environ["SERVEO_URL"]}')
-        else:
-            print(f"Serveo error: {serveo_error}")
+print(" * ngrok tunnel \"{}\" -> \"http://127.0.0.1:{}/\"".format(public_url, 5000))
 
-    except Exception as e:
-        print(f"Error starting serveo: {e}")
-
-# serveo initialization
-serveo_thread = threading.Thread(target=start_serveo)
-serveo_thread.start()
-
-def get_serveo_url():
-    try:
-        response = requests.get('https://serveo.net/api/serveo-url')
-        if response.status_code == 200:
-            serveo_url = response.json().get('url')
-            return serveo_url
-        else:
-            print(f"Serveo API error: {response.status_code}")
-    except Exception as e:
-        print(f"Error accessing Serveo API: {e}")
-
+def get_ngrok_url():
+    return public_url
 
 @app.route("/set")
 def set_webhook():
     bot_token = request.args.get("token")
-    # Use serveo public URL as the webhook URL
-    serveo_url = os.environ.get("SERVEO_URL", "https://localhost:88")
-    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url={serveo_url}/tg_webhook?token={bot_token}")
+    # Use ngrok public URL as the webhook URL
+    ngrok_url = get_ngrok_url()
+    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url={ngrok_url}/tg_webhook?token={bot_token}")
     return "SUCCESS!"
 
 @app.route("/")
@@ -104,5 +75,4 @@ def handle_webhook():
         return "Hi", 200
 
 if __name__ == '__main__':
-    serveo_url = os.environ.get("SERVEO_URL", "https://localhost:88")
-    app.run(host='localhost', port=88)
+    app.run(port=5000)
