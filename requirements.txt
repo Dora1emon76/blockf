@@ -1,0 +1,6 @@
+pyrogram
+asyncio
+requests
+flask
+gunicorn
+TgCrypto
