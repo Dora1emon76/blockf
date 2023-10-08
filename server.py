@@ -27,7 +27,7 @@ def send_post_request(bot_token, data):
 
 def start_serveo():
     try:
-        subdomain = "abhishek"  # Replace with your desired subdomain
+        subdomain = "carpo"  # Replace with your desired subdomain
         serveo_process = subprocess.Popen(['ssh', '-R', f'{subdomain}:80:localhost:88', 'serveo.net'], stdout=subprocess.PIPE)
         atexit.register(lambda: serveo_process.terminate())
         os.environ["SERVEO_URL"] = f"https://{subdomain}.serveo.net"
