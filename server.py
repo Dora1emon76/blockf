@@ -26,9 +26,10 @@ def send_post_request(bot_token, data):
 # Start serveo and create a tunnel
 def start_serveo():
     try:
-        serveo_process = subprocess.Popen(['ssh', '-R', '80:localhost:88', 'serveo.net'])
+        serveo_process = subprocess.Popen(['ssh', '-R', '80:localhost:88', 'serveo.net'], stdout=subprocess.PIPE)
         atexit.register(lambda: serveo_process.terminate())
-        os.environ["SERVEO_URL"] = f"https://{serveo_process.args[-1]}.serveo.net"
+        serveo_url = serveo_process.stdout.readline().decode().strip()
+        os.environ["SERVEO_URL"] = serveo_url
         print(f'serveo URL: {os.environ["SERVEO_URL"]}')
     except Exception as e:
         print(f"Error starting serveo: {e}")
@@ -36,6 +37,7 @@ def start_serveo():
 # serveo initialization
 serveo_thread = threading.Thread(target=start_serveo)
 serveo_thread.start()
+
 
 
 @app.route("/set")
