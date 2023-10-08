@@ -7,7 +7,6 @@ import re
 import subprocess
 import atexit
 import os
-import signal
 
 # List of patterns to match
 patterns = ['#Ad', '#branԁDiscount', '#paidAD', '#paidad', '#AD', '#Paidad', '#PaidAD', 'bots.business/ads', '#PaidAd','#PromotіonInғ1uencer','#sales','#influеncermarketіпg','#placementAd', 'sponsored','#AdvertisementMarketing']
@@ -24,32 +23,23 @@ def send_post_request(bot_token, data):
     except Exception as e:
         print(e)
 
-# Start ngrok and create a tunnel
-def start_ngrok():
-    ngrok_process = subprocess.Popen(['ngrok', 'http', '88'])
-    atexit.register(lambda: ngrok_process.terminate())
+# Start serveo and create a tunnel
+def start_serveo():
+    serveo_process = subprocess.Popen(['ssh', '-R', '80:localhost:88', 'serveo.net'])
+    atexit.register(lambda: serveo_process.terminate())
+    os.environ["SERVEO_URL"] = 'https://'+serveo_process.args[-1]+'.serveo.net'
+    print(f'serveo URL: {os.environ["SERVEO_URL"]}')
 
-    # Wait a moment to ensure ngrok has started before retrieving the public URL
-    while True:
-        try:
-            response = requests.get('http://localhost:4040/api/tunnels')
-            data = response.json()
-            ngrok_url = data['tunnels'][0]['public_url']
-            print(f'ngrok tunnel "{ngrok_url}"')
-            break
-        except requests.ConnectionError:
-            pass
-
-# ngrok initialization
-ngrok_thread = threading.Thread(target=start_ngrok)
-ngrok_thread.start()
+# serveo initialization
+serveo_thread = threading.Thread(target=start_serveo)
+serveo_thread.start()
 
 @app.route("/set")
 def set_webhook():
     bot_token = request.args.get("token")
-    # Use ngrok public URL as the webhook URL
-    ngrok_url = os.environ.get("NGROK_URL", "https://localhost:88")
-    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url={ngrok_url}/tg_webhook?token={bot_token}")
+    # Use serveo public URL as the webhook URL
+    serveo_url = os.environ.get("SERVEO_URL", "https://localhost:88")
+    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url={serveo_url}/tg_webhook?token={bot_token}")
     return "SUCCESS!"
 
 @app.route("/")
@@ -89,4 +79,5 @@ def handle_webhook():
         return "Hi", 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=88)
+    serveo_url = os.environ.get("SERVEO_URL", "https://localhost:88")
+    app.run(host='localhost', port=88)
