@@ -61,6 +61,8 @@ def handle_webhook():
     except Exception as e:
         print(e)
         return "Hi", 200
+ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+ssl_context.load_cert_chain('server.crt', 'server.key')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=88, ssl_context=ssl_context)
