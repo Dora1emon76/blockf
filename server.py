@@ -4,7 +4,11 @@ from flask import Flask, request
 import pyrogram
 import threading
 import re
-import ssl
+import subprocess
+import atexit
+import os
+import signal
+
 # List of patterns to match
 patterns = ['#Ad', '#branԁDiscount', '#paidAD', '#paidad', '#AD', '#Paidad', '#PaidAD', 'bots.business/ads', '#PaidAd','#PromotіonInғ1uencer','#sales','#influеncermarketіпg','#placementAd', 'sponsored','#AdvertisementMarketing']
 
@@ -20,10 +24,32 @@ def send_post_request(bot_token, data):
     except Exception as e:
         print(e)
 
+# Start ngrok and create a tunnel
+def start_ngrok():
+    ngrok_process = subprocess.Popen(['ngrok', 'http', '88'])
+    atexit.register(lambda: ngrok_process.terminate())
+
+    # Wait a moment to ensure ngrok has started before retrieving the public URL
+    while True:
+        try:
+            response = requests.get('http://localhost:4040/api/tunnels')
+            data = response.json()
+            ngrok_url = data['tunnels'][0]['public_url']
+            print(f'ngrok tunnel "{ngrok_url}"')
+            break
+        except requests.ConnectionError:
+            pass
+
+# ngrok initialization
+ngrok_thread = threading.Thread(target=start_ngrok)
+ngrok_thread.start()
+
 @app.route("/set")
 def set_webhook():
     bot_token = request.args.get("token")
-    requests.get("https://api.telegram.org/bot" + bot_token + "/setWebhook?url=https://62.72.24.208:88/tg_webhook?token=" + bot_token)
+    # Use ngrok public URL as the webhook URL
+    ngrok_url = os.environ.get("NGROK_URL", "https://localhost:88")
+    requests.get(f"https://api.telegram.org/bot{bot_token}/setWebhook?url={ngrok_url}/tg_webhook?token={bot_token}")
     return "SUCCESS!"
 
 @app.route("/")
@@ -61,8 +87,6 @@ def handle_webhook():
     except Exception as e:
         print(e)
         return "Hi", 200
-ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-ssl_context.load_cert_chain('server.crt', 'server.key')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=88, ssl_context=ssl_context)
+    app.run(host='0.0.0.0', port=88)
