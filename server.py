@@ -23,7 +23,7 @@ def send_post_request(bot_token, data):
 @app.route("/set")
 def set_webhook():
     bot_token = request.args.get("token")
-    requests.get("https://api.telegram.org/bot" + bot_token + "/setWebhook?url=https://62.72.24.208/tg_webhook?token=" + bot_token)
+    requests.get("https://api.telegram.org/bot" + bot_token + "/setWebhook?url=https://62.72.24.208:90/tg_webhook?token=" + bot_token)
     return "SUCCESS!"
 
 @app.route("/")
