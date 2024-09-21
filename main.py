@@ -58,9 +58,10 @@ def handle_webhook():
                 chat_id = data['message']['chat']['id']
                 for i in range(1, 6):
                     message = await bot.get_messages(chat_id, current_msg_id + i)
-                    print(f"errr: {message.from_user.id}")
+                    fid = message.from_user.id
+                    print(f"errr: {fid}")
                     # Check if the message text matches any pattern
-                    if message.from_user.id == bot_id and not re.search(pattern, message.text):
+                    if fid == bot_id and not re.search(pattern, message.text):
                         await message.delete()
                     await asyncio.sleep(0.5) 
                         #print(f'Message with id {current_msg_id + i} deleted successfully')
