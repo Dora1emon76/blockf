@@ -61,7 +61,7 @@ def handle_webhook():
                     fid = message.from_user.id
                     print(message)
                     # Check if the message text matches any pattern
-                    if message.from_user.is_bot == true and not re.search(pattern, message.text):
+                    if message.from_user.is_bot and not re.search(pattern, message.text):
                         await message.delete()
                     await asyncio.sleep(0.5) 
                         #print(f'Message with id {current_msg_id + i} deleted successfully')
