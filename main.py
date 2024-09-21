@@ -4,7 +4,6 @@ from flask import Flask, request
 import pyrogram
 import threading
 import re
-import time 
 from pyngrok import ngrok  # Install pyngrok using pip install pyngrok
 
 # List of patterns to match
@@ -63,6 +62,7 @@ def handle_webhook():
                     # Check if the message text matches any pattern
                     if message.from_user.id == bot_id and not re.search(pattern, message.text):
                         await message.delete()
+                    await asyncio.sleep(0.5) 
                         #print(f'Message with id {current_msg_id + i} deleted successfully')
 
         # Define the loop
