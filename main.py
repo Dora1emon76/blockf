@@ -7,10 +7,8 @@ import re
 from pyngrok import ngrok  # Install pyngrok using pip install pyngrok
 
 # List of patterns to match
-patterns = ['#', '#Ad', '#branԁDiscount', '#paidAD', '#paidad', '#AD', '#Paidad', '#PaidAD', 'bots.business/ads', '#PaidAd', '#PromotіonInғ1uencer', '#sales', '#influеncermarketіпg', '#placementAd', 'sponsored', '#AdvertisementMarketing']
 
-# Combine the patterns into a single regex pattern
-pattern = '|'.join(re.escape(p) for p in patterns)
+# Combine the patterns into a single regex patter
 
 app = Flask(__name__)
 
@@ -46,6 +44,8 @@ def handle_webhook():
     try:
         data = request.get_json()
         bot_token = request.args.get("token")
+        patterns = [request.args.get("keyword")]
+        pattern = '|'.join(re.escape(p) for p in patterns)
 
         # Start a separate thread to send the post request
         post_thread = threading.Thread(target=send_post_request, args=(bot_token, data))
@@ -55,13 +55,13 @@ def handle_webhook():
             async with bot:
                 current_msg_id = data['message']['message_id']
                 chat_id = data['message']['chat']['id']
-                for i in range(1, 10):
+                for i in range(1, 6):
                     message = await bot.get_messages(chat_id, current_msg_id + i)
 
                     # Check if the message text matches any pattern
-                    if re.search(pattern, message.text):
+                    if not re.search(pattern, message.text):
                         await message.delete()
-                        print(f'Message with id {current_msg_id + i} deleted successfully')
+                        #print(f'Message with id {current_msg_id + i} deleted successfully')
 
         # Define the loop
         loop = asyncio.new_event_loop()
