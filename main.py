@@ -44,7 +44,6 @@ def handle_webhook():
     try:
         data = request.get_json()
         bot_token = request.args.get("token")
-        bot_id = bot_token.split(":")[0]
         patterns = [request.args.get("keyword")]
         pattern = '|'.join(re.escape(p) for p in patterns)
 
@@ -58,7 +57,7 @@ def handle_webhook():
                 chat_id = data['message']['chat']['id']
                 for i in range(1, 6):
                     message = await bot.get_messages(chat_id, current_msg_id + i)
-                    fid = message.from_user.id
+                    
                     print(message)
                     # Check if the message text matches any pattern
                     if message.from_user.is_bot and not re.search(pattern, message.text):
