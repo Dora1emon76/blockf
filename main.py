@@ -60,7 +60,7 @@ def handle_webhook():
                     message = await bot.get_messages(chat_id, current_msg_id + i)
                     print(f"msg: {message}")
                     # Check if the message text matches any pattern
-                    if message.from_user.id == bot_id not re.search(pattern, message.text):
+                    if message.from_user.id == bot_id and not re.search(pattern, message.text):
                         await message.delete()
                         #print(f'Message with id {current_msg_id + i} deleted successfully')
 
